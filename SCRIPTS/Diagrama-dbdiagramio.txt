@@ -1,0 +1,76 @@
+Table mesas {
+  id int [primary key, increment]
+  numero int
+  estado varchar(20) // 'Libre', 'Ocupada', 'Por Desocupar'
+}
+
+Table empleados {
+  id int [primary key, increment]
+  nombre varchar(100)
+  tipo varchar(20) // 'Cajero' o 'Mesero'
+  turno varchar(20)
+}
+
+Table cajas {
+  id int [primary key, increment]
+  saldo_apertura decimal(10,2)
+  saldo_cierre decimal(10,2)
+  empleado_id int [ref: > empleados.id]
+}
+
+Table pedidos {
+  id int [primary key, increment]
+  mesa_id int [ref: > mesas.id]
+  empleado_id int [ref: > empleados.id]
+  estado varchar(20) // 'Pendiente', 'En proceso', 'Finalizado'
+  hora_inicio timestamp
+  hora_fin timestamp
+  fecha timestamp
+}
+
+Table productos {
+  id int [primary key, increment]
+  nombre varchar(100)
+  tipo varchar(50) // 'Bebida', 'Comida', 'Postre'
+  precio decimal(10,2)
+}
+
+Table menus {
+  id int [primary key, increment]
+  nombre varchar(100)
+}
+
+Table menu_productos {
+  id int [primary key, increment]
+  menu_id int [ref: > menus.id]
+  producto_id int [ref: > productos.id]
+  cantidad int
+}
+
+Table detalle_pedido {
+  id int [primary key, increment]
+  pedido_id int [ref: > pedidos.id]
+  producto_id int [ref: > productos.id]
+  menu_id int [ref: > menus.id]
+  cantidad int
+  precio decimal(10,2)
+  estado varchar(20) // 'En preparación' o 'Despachado'
+  hora_solicitud timestamp
+}
+
+Table facturas {
+  id int [primary key, increment]
+  pedido_id int [ref: > pedidos.id]
+  caja_id int [ref: > cajas.id]
+  total decimal(10,2)
+  metodo_pago varchar(20) // 'Efectivo' o 'Tarjeta'
+  fecha timestamp
+}
+
+Table bitacora {
+  id int [primary key, increment]
+  usuario varchar(100)
+  operacion varchar(50)
+  fecha timestamp
+  detalle text
+}
