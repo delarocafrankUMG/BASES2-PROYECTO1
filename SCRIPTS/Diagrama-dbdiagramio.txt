@@ -40,7 +40,7 @@ Table menus {
   nombre varchar(100)
 }
 
-Table menu_productos {
+Table menu_PRODUCTO {
   id int [primary key, increment]
   menu_id int [ref: > menus.id]
   producto_id int [ref: > productos.id]
