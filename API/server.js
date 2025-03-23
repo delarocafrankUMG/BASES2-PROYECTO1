@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 const mesasRoutes = require("./routes/mesas.routes");
 const cajasRoutes = require("./routes/cajas.routes");
 const facturasRoutes = require("./routes/facturas.routes");
@@ -6,6 +7,7 @@ const pedidosRoutes = require("./routes/pedidos.routes");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use("/api/mesas", mesasRoutes);
 app.use("/api/cajas", cajasRoutes);
