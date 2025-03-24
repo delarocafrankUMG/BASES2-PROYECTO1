@@ -61,4 +61,75 @@ async function actualizarEstadoPedido(req, res) {
   }
 }
 
-module.exports = { agregarDetallePedido, getPedidosCocina, actualizarEstadoPedido };
+// Obtener todos los productos
+async function getProductos(req, res) {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `BEGIN RESTAURANTE.SP_S_PRODUCTO(:cursor); END;`,
+      { cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR } }
+    );
+
+    const resultSet = result.outBinds.cursor;
+    const rows = await resultSet.getRows();
+    await resultSet.close();
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// Obtener todos los menús
+async function getMenus(req, res) {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `BEGIN RESTAURANTE.SP_S_MENU(:cursor); END;`,
+      { cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR } }
+    );
+
+    const resultSet = result.outBinds.cursor;
+    const rows = await resultSet.getRows();
+    await resultSet.close();
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// Obtener productos de un menú específico
+async function getProductosMenu(req, res) {
+  const { menuId } = req.params;
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `BEGIN RESTAURANTE.SP_S_MENU_PRODUCTO(:menuId, :cursor); END;`,
+      {
+        menuId: parseInt(menuId),
+        cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
+      }
+    );
+
+    const resultSet = result.outBinds.cursor;
+    const rows = await resultSet.getRows();
+    await resultSet.close();
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+
+module.exports = { agregarDetallePedido, getPedidosCocina, actualizarEstadoPedido, getProductos, getMenus, getProductosMenu };
