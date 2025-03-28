@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>Seleccione el método de pago</h2>
+    <mat-dialog-content>
+    <p>¿Cómo desea pagar?</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+    <button mat-button (click)="selectPayment('Efectivo')" color="primary">Efectivo</button>
+    <button mat-button (click)="selectPayment('Tarjeta')" color="accent">Tarjeta</button>
+    </mat-dialog-actions>

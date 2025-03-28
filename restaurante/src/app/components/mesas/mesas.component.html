@@ -1,0 +1,70 @@
+<div cdkDropListGroup>
+    <div class="example-container">
+      <h2>Menu</h2>
+  
+      <div
+        cdkDropList
+        [cdkDropListData]="productos"
+        class="example-list"
+        (cdkDropListDropped)="drop($event)">
+        @for (item of productos; track item.nombre) {
+          <div class="example-box" cdkDrag>{{item.nombre}}</div>
+        }
+        @for (item of menus; track item.nombre) {
+          <div class="example-box" cdkDrag>{{item.nombre}}</div>
+        }
+      </div>
+    </div>
+  
+    <div class="example-container">
+      <h2>Mesas</h2> 
+      @for(mesa of mesas; track mesa.id){
+        <mat-card appearance="outlined">
+          <mat-card-header style="padding-bottom: 5px;display: flex;justify-content: space-between;"> 
+            <mat-card-title>
+              {{mesa.numero}}
+            </mat-card-title>
+            <mat-chip [ngClass]="mesa.estado.toLowerCase() == 'libre' ? 'chip-verde' : 'chip-rojo'"> {{mesa.estado}}</mat-chip>
+          </mat-card-header>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-chip-set aria-label="Pedidos">
+              @for(pedido of fncGetPedidosPorMesa(mesa.numero); track pedido.id){
+                <mat-chip [matBadge]="pedido.cantidad" [ngClass]="pedido.estado.toLowerCase() == 'en preparación' ? 'chip-verde' : 'chip-rojo'"> {{pedido.producto}}</mat-chip>
+              }
+            </mat-chip-set>
+            @if(mesa.estado.toLowerCase() === 'ocupada'){
+              <div
+              cdkDropList
+              [cdkDropListData]="mesa.nuevoPedido"
+              class="example-list"
+              (cdkDropListDropped)="drop($event)">
+              @for (item of mesa.nuevoPedido; track (item.listingId)) {
+                <div class="example-box">{{item.nombre}} <button mat-icon-button aria-label="removeButton" (click)="removePedido(item, mesa)">
+                  <mat-icon>close</mat-icon>
+                </button></div>
+              }
+              </div>
+            }
+            
+          </mat-card-content>
+          <mat-card-actions>
+            @if(mesa.nuevoPedido.length != 0){
+              <button mat-raised-button (click)="confirmarPedido(mesa)">Confirmar</button>
+            }
+            @if(mesa.nuevoPedido.length == 0 && fncGetPedidosPorMesa(mesa.numero).length > 0){
+              <button mat-raised-button (click)="facturar()">Facturar</button>
+            }
+            @if(mesa.estado.toLowerCase() === 'libre'){
+              <button mat-raised-button (click)="confirmarPedido(mesa)">Asignar</button>
+            }
+
+            @if(mesa.estado.toLowerCase() === 'por desocupar'){
+              <button mat-raised-button (click)="confirmarPedido(mesa)">Liberar</button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+      
+    </div>
+  </div>

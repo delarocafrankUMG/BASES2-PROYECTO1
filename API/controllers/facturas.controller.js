@@ -3,13 +3,13 @@ const oracledb = require("oracledb");
 
 //Generar una factura
 async function generarFactura(req, res) {
-  const { pedidoId, cajaId, total, metodoPago } = req.body;
+  const { pedidoId, cajaId, metodoPago } = req.body;
   let connection;
   try {
     connection = await getConnection();
     await connection.execute(
-      `BEGIN RESTAURANTE.SP_I_FACTURAR(:pedidoId, :cajaId, :total, :metodoPago); END;`,
-      { pedidoId, cajaId, total, metodoPago }
+      `BEGIN RESTAURANTE.SP_I_FACTURAR(:pedidoId, :cajaId, :metodoPago); END;`,
+      { pedidoId, cajaId, metodoPago }
     );
     await connection.commit();
     res.status(201).json({ message: "Factura generada correctamente" });

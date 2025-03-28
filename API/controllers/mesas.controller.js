@@ -12,8 +12,14 @@ async function getMesas(req, res) {
     );
     const cursor = result.outBinds.cursor;
     const rows = await cursor.getRows();
-    cursor.close();
-    res.json(rows);
+    const metaData = cursor.metaData.map(col => col.name.toLowerCase());
+    await cursor.close();
+
+    const formattedRows = rows.map(row =>
+      Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+    );
+
+    res.json(formattedRows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   } finally {

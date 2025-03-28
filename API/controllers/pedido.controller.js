@@ -3,13 +3,14 @@ const oracledb = require("oracledb");
 
 // Agregar un producto o combo a un pedido
 async function agregarDetallePedido(req, res) {
-  const { pedidoId, productoId, menuId, cantidad, precio } = req.body;
+  const { pedido_id, productoid, menuid, cantidad, precio } = req.body;
+  console.log(req.body)
   let connection;
   try {
     connection = await getConnection();
     await connection.execute(
-      `BEGIN RESTAURANTE.SP_I_DETALLE_PEDIDO(:pedidoId, :productoId, :menuId, :cantidad, :precio); END;`,
-      { pedidoId, productoId, menuId, cantidad, precio }
+      `BEGIN RESTAURANTE.SP_I_DETALLE_PEDIDO(:pedido_id, :productoid, :menuid, :cantidad, :precio); END;`,
+      { pedido_id, productoid, menuid, cantidad, precio }
     );
     await connection.commit();
     res.status(201).json({ message: "Producto/Combo agregado al pedido" });
@@ -32,9 +33,14 @@ async function getPedidosCocina(req, res) {
 
     const resultSet = result.outBinds.cursor;
     const rows = await resultSet.getRows(); // Obtiene todas las filas del cursor
+    const metaData = resultSet.metaData.map(col => col.name.toLowerCase());
     await resultSet.close(); // Cierra el cursor
 
-    res.json(rows);
+    const formattedRows = rows.map(row =>
+      Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+    );
+
+    res.json(formattedRows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   } finally {
@@ -50,7 +56,7 @@ async function actualizarEstadoPedido(req, res) {
     connection = await getConnection();
     await connection.execute(
       `BEGIN RESTAURANTE.SP_U_ESTADO_PEDIDO(:detallePedidoId, :estado); END;`,
-      { detallePedidoId, estado }
+      { detallePedidoId: parseInt(detallePedidoId), estado: parseInt(estado) }
     );
     await connection.commit();
     res.status(200).json({ message: "Estado de pedido actualizado" });
@@ -73,9 +79,14 @@ async function getProductos(req, res) {
 
     const resultSet = result.outBinds.cursor;
     const rows = await resultSet.getRows();
+    const metaData = resultSet.metaData.map(col => col.name.toLowerCase());
     await resultSet.close();
 
-    res.json(rows);
+    const formattedRows = rows.map(row =>
+      Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+    );
+
+    res.json(formattedRows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   } finally {
@@ -95,9 +106,14 @@ async function getMenus(req, res) {
 
     const resultSet = result.outBinds.cursor;
     const rows = await resultSet.getRows();
+    const metaData = resultSet.metaData.map(col => col.name.toLowerCase());
     await resultSet.close();
 
-    res.json(rows);
+    const formattedRows = rows.map(row =>
+      Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+    );
+
+    res.json(formattedRows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   } finally {
@@ -121,9 +137,14 @@ async function getProductosMenu(req, res) {
 
     const resultSet = result.outBinds.cursor;
     const rows = await resultSet.getRows();
+    const metaData = resultSet.metaData.map(col => col.name.toLowerCase());
     await resultSet.close();
 
-    res.json(rows);
+    const formattedRows = rows.map(row =>
+      Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+    );
+
+    res.json(formattedRows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   } finally {
