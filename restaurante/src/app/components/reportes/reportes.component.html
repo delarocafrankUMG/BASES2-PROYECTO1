@@ -1,0 +1,27 @@
+<div class="botones-reporte" style="margin-bottom: 16px;">
+    <button mat-raised-button color="primary"
+            *ngFor="let v of views"
+            (click)="cargarReporte(v.value)"
+            [disabled]="selectedView === v.value"
+            style="margin-right: 8px;">
+      {{ v.name }}
+    </button>
+  </div>
+  
+  <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 16px;">
+    <mat-label>Filtrar</mat-label>
+    <input matInput (keyup)="aplicarFiltro($event)" placeholder="Escribe para filtrar resultados">
+  </mat-form-field>
+  
+  <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
+      <mat-header-cell *matHeaderCellDef> {{ col }} </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{ row[col] }} </mat-cell>
+    </ng-container>
+  
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  

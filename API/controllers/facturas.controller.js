@@ -1,8 +1,9 @@
-const { getConnection } = require("../db/connection"); // Asegúrate de importar tu conexión a Oracle
+const { getConnection } = require("../db/connection");
 const oracledb = require("oracledb");
 
 //Generar una factura
 async function generarFactura(req, res) {
+  console.log(req.body)
   const { pedidoId, cajaId, metodoPago } = req.body;
   let connection;
   try {

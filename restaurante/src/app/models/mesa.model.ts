@@ -1,11 +1,11 @@
-import { Menu } from "./menu.model";
-import { Producto } from "./producto.modelo";
+import { Pedido } from "./pedido.model";
 
 export interface Mesa {
     id: number;
     nombre: string;
     capacidad: number;
     numero: number;
-    estado: 'libre' | 'ocupada' | 'por desocupar';
-    nuevoPedido: (Producto| Menu)[];
+    estado: 'Libre' | 'Ocupada' | 'Por Desocupar';
+
+    pedidos: Pedido[];
   }

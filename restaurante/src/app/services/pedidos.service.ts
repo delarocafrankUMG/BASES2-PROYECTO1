@@ -5,6 +5,7 @@ import { DetallePedido } from '../models/detalle-pedido.model';
 import { Observable } from 'rxjs';
 import { Producto } from '../models/producto.modelo';
 import { Menu } from '../models/menu.model';
+import { Pedido } from '../models/pedido.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class PedidosService {
   }
 
   actualizarEstadoPedido(detallePedidoId: number, estado: string): Observable<{ message: string }> {
-    return this.http.put<{ message: string }>(`${this.apiUrl}`, { detallePedidoId, estado });
+    return this.http.put<{ message: string }>(`${this.apiUrl}`, { "detallePedidoId":detallePedidoId, "estado":estado });
   }
   
   // Obtener todos los productos
@@ -40,5 +41,10 @@ export class PedidosService {
   // Obtener productos de un menú específico
   getMenuProductos(menuId: number): Observable<Producto[]> {
     return this.http.get<Producto[]>(`${this.apiUrl}/productos-menu/${menuId}`);
+  }
+
+  // Crear pedido
+  crearPedido(mesaId: number, empleadoId: number): Observable<Pedido> {
+    return this.http.post<Pedido>(`${this.apiUrl}/pedido`, { mesaId, empleadoId });
   }
 }

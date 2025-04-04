@@ -1,0 +1,17 @@
+@if(empleado){
+    <mat-card>
+    <mat-card-actions style="justify-content: end;">
+        <button *ngIf="esMesero()" mat-flat-button color="primary" [routerLink]="'/mesas'">Mesas</button>
+        <button *ngIf="esMesero()" mat-flat-button color="primary" [routerLink]="'/cocina'">Cocina</button>
+        
+        <!-- Botón visible para Cajeros -->
+        <button *ngIf="esCajero()" mat-flat-button color="warn" [routerLink]="'/cajas'">Caja</button>
+        
+        <!-- Reportes visibles para todos -->
+        <button *ngIf="esAdmin()" mat-flat-button color="basic" [routerLink]="'/reportes'">Reportes</button> 
+        <button mat-icon-button aria-label="logout" (click)="logout()">
+            <mat-icon>power_settings_new</mat-icon>
+          </button>
+    </mat-card-actions>
+</mat-card>
+}

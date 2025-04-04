@@ -1,4 +1,5 @@
 const { getConnection } = require("../db/connection");
+const oracledb = require("oracledb");
 
 // Abrir una caja
 async function abrirCaja(req, res) {
@@ -41,24 +42,29 @@ async function cerrarCaja(req, res) {
 
 // Obtener todas las cajas
 async function getCajas(req, res) {
-    let connection;
-    try {
-      connection = await getConnection();
-      const result = await connection.execute(
-        `BEGIN RESTAURANTE.SP_S_CAJA(:cursor); END;`,
-        { cursor: { dir: require("oracledb").BIND_OUT, type: require("oracledb").CURSOR } }
-      );
-  
-      const resultSet = result.outBinds.cursor;
-      const rows = await resultSet.getRows(); // Obtiene todas las filas del cursor
-      await resultSet.close(); // Cierra el cursor
-  
-      res.json(rows);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    } finally {
-      if (connection) await connection.close();
-    }
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `BEGIN RESTAURANTE.SP_S_CAJA(:cursor); END;`,
+      { cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR } }
+    );
+
+    const resultSet = result.outBinds.cursor;
+    const rows = await resultSet.getRows(); // Obtiene todas las filas del cursor
+    const metaData = resultSet.metaData.map(col => col.name.toLowerCase());
+    await resultSet.close(); // Cierra el cursor
+
+    const formattedRows = rows.map(row =>
+      Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+    );
+
+    res.json(formattedRows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (connection) await connection.close();
   }
+}
 
 module.exports = { abrirCaja, cerrarCaja, getCajas };

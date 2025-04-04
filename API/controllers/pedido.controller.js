@@ -1,4 +1,4 @@
-const { getConnection } = require("../db/connection"); // Asegúrate de importar la conexión a Oracle
+const { getConnection } = require("../db/connection");
 const oracledb = require("oracledb");
 
 // Agregar un producto o combo a un pedido
@@ -50,13 +50,14 @@ async function getPedidosCocina(req, res) {
 
 // Actualizar estado de un pedido en cocina
 async function actualizarEstadoPedido(req, res) {
+  console.log(req.body)
   const { detallePedidoId, estado } = req.body;
   let connection;
   try {
     connection = await getConnection();
     await connection.execute(
       `BEGIN RESTAURANTE.SP_U_ESTADO_PEDIDO(:detallePedidoId, :estado); END;`,
-      { detallePedidoId: parseInt(detallePedidoId), estado: parseInt(estado) }
+      { detallePedidoId: detallePedidoId, estado: estado}
     );
     await connection.commit();
     res.status(200).json({ message: "Estado de pedido actualizado" });
@@ -152,5 +153,41 @@ async function getProductosMenu(req, res) {
   }
 }
 
+  // Crear pedidos
+  async function crearPedido(req, res) {
+    const { mesaId, empleadoId } = req.body;
+    let connection;
+  
+    try {
+      connection = await getConnection();
+      const result = await connection.execute(
+        `BEGIN RESTAURANTE.SP_I_PEDIDO(:mesaId, :empleadoId, :cursor); END;`,
+        {
+          mesaId,
+          empleadoId,
+          cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
+        }
+      );
+  
+      const resultSet = result.outBinds.cursor;
+      const rows = await resultSet.getRows(); // Obtener las filas del cursor
+      const metaData = resultSet.metaData.map(col => col.name.toLowerCase()); // Obtener nombres de columnas en minúsculas
+      await resultSet.close();
+      await connection.commit();
+  
+      // Mapear los resultados al formato de la interfaz Pedido
+      const pedidos = rows.map(row =>
+        Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+      );
+  
+      res.status(201).json(pedidos.length > 0 ? pedidos[0] : null); // Enviar el primer pedido creado
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    } finally {
+      if (connection) await connection.close();
+    }
+  }
+  
 
-module.exports = { agregarDetallePedido, getPedidosCocina, actualizarEstadoPedido, getProductos, getMenus, getProductosMenu };
+
+module.exports = { agregarDetallePedido, getPedidosCocina, actualizarEstadoPedido, getProductos, getMenus, getProductosMenu, crearPedido };

@@ -1,0 +1,28 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>
+            Gestion de Caja
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        @if(caja){
+            <h3>Cerrar Caja</h3>
+        }@else {
+            <h3>Abrir Caja</h3>
+        }
+        <mat-card class="form-container">
+            <form [formGroup]="CajaForm" (ngSubmit)="onSubmit()">
+              <mat-form-field class="full-width">
+                <mat-label>Saldo</mat-label>
+                <input matInput type="number" formControlName="saldo" required />
+              </mat-form-field>
+          
+           
+                <button mat-raised-button color="primary" type="submit" [disabled]="CajaForm.invalid">
+                  Guardar
+                </button>
+              
+            </form>
+          </mat-card>
+    </mat-card-content>
+</mat-card>

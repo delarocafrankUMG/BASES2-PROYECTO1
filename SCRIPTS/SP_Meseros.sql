@@ -25,3 +25,38 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('Mesero asignado a mesa ' || p_MESA_ID || ': ' || v_mesero_id);
 END SP_S_MESERO_POR_MESA;
 /
+
+-- Login
+CREATE OR REPLACE PROCEDURE RESTAURANTE.SP_VALIDATE_LOGIN (
+    p_username IN VARCHAR2,
+    p_password IN VARCHAR2,
+    p_valid OUT BOOLEAN,
+    p_empleado OUT RESTAURANTE.TBL_EMPLEADO%ROWTYPE
+) AS
+    v_password_hash VARCHAR2(255);
+BEGIN
+    -- Intentar obtener el hash de la contraseña para el usuario dado
+    BEGIN
+        SELECT PASSWORD_HASH, ID, NOMBRE, TIPO, TURNO, USERNAME
+        INTO v_password_hash, p_empleado.ID, p_empleado.NOMBRE, p_empleado.TIPO, p_empleado.TURNO, p_empleado.USERNAME
+        FROM RESTAURANTE.TBL_EMPLEADO
+        WHERE USERNAME = p_username;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            p_valid := FALSE;
+            RETURN;
+    END;
+
+    -- Validar si la contraseña proporcionada coincide con el hash almacenado
+    IF p_password = v_password_hash THEN
+        p_valid := TRUE;
+    ELSE
+        p_valid := FALSE;
+    END IF;
+    
+EXCEPTION
+    WHEN OTHERS THEN
+        p_valid := FALSE;
+        -- Opcionalmente podrías registrar el error para fines de depuración
+END SP_VALIDATE_LOGIN;
+/

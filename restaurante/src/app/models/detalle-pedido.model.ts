@@ -7,5 +7,5 @@ export interface DetallePedido {
     precio: number;
     numero_mesa: number;
     producto: string;
-    estado: 'pendiente' | 'en preparación' | 'listo';
+    estado: 'Pendiente' | 'En preparación' | 'Listo' | 'Despachado';
   }

@@ -51,6 +51,7 @@ async function updateMesaEstado(req, res) {
     const { id } = req.params;
     const { estado } = req.body;
     let connection;
+    console.log(req)
     try {
       connection = await getConnection();
       await connection.execute(
@@ -66,4 +67,37 @@ async function updateMesaEstado(req, res) {
     }
   }
 
-module.exports = { getMesas, insertMesa, updateMesaEstado };
+  // Obtener los pedidos por mesa
+  async function getPedidosPorMesa(req, res) {
+    const { mesaId } = req.params;
+    let connection;
+    try {
+      connection = await getConnection();
+      const result = await connection.execute(
+        `BEGIN RESTAURANTE.SP_S_PEDIDOS_POR_MESA(:mesaId, :cursor); END;`,
+        {
+          mesaId: parseInt(mesaId),
+          cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
+        }
+      );
+  
+      const resultSet = result.outBinds.cursor;
+      const rows = await resultSet.getRows();
+      const metaData = resultSet.metaData.map(col => col.name.toLowerCase());
+      await resultSet.close();
+  
+      const formattedRows = rows.map(row =>
+        Object.fromEntries(row.map((value, index) => [metaData[index], value]))
+      );
+  
+      res.json(formattedRows);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    } finally {
+      if (connection) await connection.close();
+    }
+  }
+
+
+
+module.exports = { getMesas, insertMesa, updateMesaEstado, getPedidosPorMesa };

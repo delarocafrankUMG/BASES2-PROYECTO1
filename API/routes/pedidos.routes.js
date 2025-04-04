@@ -1,5 +1,5 @@
 const express = require("express");
-const { agregarDetallePedido, getPedidosCocina, actualizarEstadoPedido, getProductos, getMenus, getProductosMenu } = require("../controllers/pedido.controller");
+const { agregarDetallePedido, getPedidosCocina, actualizarEstadoPedido, getProductos, getMenus, getProductosMenu, crearPedido } = require("../controllers/pedido.controller");
 
 const router = express.Router();
 
@@ -20,5 +20,8 @@ router.get("/menus", getMenus);
 
 // Obtener los productos de un menu en especifico
 router.get("/productos-menu/:menuId", getProductosMenu);
+
+// Crear Pedido
+router.post("/pedido", crearPedido)
 
 module.exports = router;

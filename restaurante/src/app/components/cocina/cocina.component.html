@@ -1,0 +1,22 @@
+<h2>Pedidos Cocina</h2>
+<div style="display: flex;flex-wrap: wrap;">
+@for(pedido of pedidos; track pedido.id){
+ <mat-card style="width: 300px;margin:5px">
+    <mat-card-title>
+      Mesa:  {{getMesaNumber(pedido.numero_mesa)}}
+      Pedido: #{{pedido.pedido_id}}
+    </mat-card-title>
+    <mat-card-content style="display: flex;flex-direction: column;align-items: center;">
+        <mat-chip [ngClass]="pedido.estado.toLowerCase() == 'pendiente' ? 'chip-rojo' :( pedido.estado.toLowerCase() == 'en preparación' ? 'chip-amarillo' :'chip-verde')" (click)="ciclarEstadoPedido(pedido)"> {{pedido.estado}}</mat-chip>
+        <span>Producto: {{pedido.producto}}</span>
+       <span>  Cantidad: {{pedido.cantidad}} </span>
+    </mat-card-content>
+ </mat-card>
+}
+@if(pedidos.length == 0){
+    <div style="display: flex;align-items: center;width: 100%;flex-direction: column;">
+        <h1>Todo al dia, no hay pedidos pendientes.</h1>
+    </div>
+
+}
+</div>

@@ -1,13 +1,21 @@
 <div cdkDropListGroup>
-    <div class="example-container">
-      <h2>Menu</h2>
-  
+    <div class="example-container" style="overflow: scroll; max-height: 85vh;">
+      <div style="position: sticky;z-index: 1000; top: 0; background-color: white;">
+        <h2>Menu</h2> 
+        <mat-form-field style="width: 100%;">
+          <mat-label>Buscar...</mat-label>
+          <input matInput type="text" [(ngModel)]="menuFind" (input)="filtrarMenu()">
+          <button matSuffix mat-icon-button aria-label="Find" (click)="filtrarMenu()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
       <div
         cdkDropList
-        [cdkDropListData]="productos"
+        [cdkDropListData]="productosFiltered"
         class="example-list"
         (cdkDropListDropped)="drop($event)">
-        @for (item of productos; track item.nombre) {
+        @for (item of productosFiltered; track item.nombre) {
           <div class="example-box" cdkDrag>{{item.nombre}}</div>
         }
         @for (item of menus; track item.nombre) {
@@ -16,52 +24,73 @@
       </div>
     </div>
   
-    <div class="example-container">
-      <h2>Mesas</h2> 
+    <div class="example-container" style="overflow: scroll; max-height: 85vh;">
+      <div style="position: sticky;z-index: 1000; top: 0; background-color: white;">
+        <h2>Mesas</h2> 
+      </div>
       @for(mesa of mesas; track mesa.id){
-        <mat-card appearance="outlined">
+        <mat-card appearance="outlined" style="margin-bottom: 10px;">
           <mat-card-header style="padding-bottom: 5px;display: flex;justify-content: space-between;"> 
             <mat-card-title>
               {{mesa.numero}}
             </mat-card-title>
-            <mat-chip [ngClass]="mesa.estado.toLowerCase() == 'libre' ? 'chip-verde' : 'chip-rojo'"> {{mesa.estado}}</mat-chip>
+            <mat-chip [ngClass]="mesa.estado.toLowerCase() == 'libre' ? 'chip-verde' : 'chip-rojo'" (click)="ciclarEstadoMesa(mesa)"> {{mesa.estado}}</mat-chip>
+            <button mat-icon-button aria-label="addButton" (click)="addPedido(mesa.id)">
+              <mat-icon>add</mat-icon>
+            </button>
           </mat-card-header>
           <mat-divider></mat-divider>
           <mat-card-content>
-            <mat-chip-set aria-label="Pedidos">
-              @for(pedido of fncGetPedidosPorMesa(mesa.numero); track pedido.id){
-                <mat-chip [matBadge]="pedido.cantidad" [ngClass]="pedido.estado.toLowerCase() == 'en preparación' ? 'chip-verde' : 'chip-rojo'"> {{pedido.producto}}</mat-chip>
-              }
-            </mat-chip-set>
-            @if(mesa.estado.toLowerCase() === 'ocupada'){
-              <div
-              cdkDropList
-              [cdkDropListData]="mesa.nuevoPedido"
-              class="example-list"
-              (cdkDropListDropped)="drop($event)">
-              @for (item of mesa.nuevoPedido; track (item.listingId)) {
-                <div class="example-box">{{item.nombre}} <button mat-icon-button aria-label="removeButton" (click)="removePedido(item, mesa)">
-                  <mat-icon>close</mat-icon>
-                </button></div>
-              }
+            @for (pedido of mesa.pedidos; track pedido.pedido_id) {
+              <div style="display: flex; justify-content: space-between;">
+                <div>
+                  <h4>Pedido: #{{ pedido.pedido_id}}</h4>
+                </div>
+                <div>              
+                  <h4>Total Q. {{pedido.total}} </h4>
+                </div>
               </div>
+
+              <mat-chip-set aria-label="Pedidos">
+                @for(detallePedido of fncGetDetallePedido(pedido.pedido_id); track detallePedido.id){
+                  <mat-chip [matBadge]="detallePedido.cantidad" [ngClass]="detallePedido.estado.toLowerCase() == 'pendiente' ? 'chip-rojo' :( detallePedido.estado.toLowerCase() == 'en preparación' ? 'chip-amarillo' :'chip-verde')"> {{detallePedido.producto}}</mat-chip>
+                }
+              </mat-chip-set>   
+                <div
+                cdkDropList
+                [cdkDropListData]="pedido.nuevoPedido"
+                class="example-list"
+                (cdkDropListDropped)="drop($event)">
+                @for (item of pedido.nuevoPedido; track (item.listingId)) {
+                  <div class="example-box">{{item.nombre}} <button mat-icon-button aria-label="removeButton" (click)="removePedido(item, pedido)">
+                    <mat-icon>close</mat-icon>
+                  </button></div>
+                }
+                </div>
+                <div>
+                  @if(pedido.nuevoPedido){
+                    @if(pedido.nuevoPedido.length != 0){
+                      <button mat-raised-button (click)="confirmarPedido(pedido)">Confirmar</button>
+                    }
+
+                    @if(pedido.nuevoPedido.length == 0){
+                      <button mat-raised-button (click)="openPaymentDialog(pedido)">Facturar</button>
+                    }
+                  }
+                </div>
+              
             }
-            
+         
           </mat-card-content>
           <mat-card-actions>
-            @if(mesa.nuevoPedido.length != 0){
-              <button mat-raised-button (click)="confirmarPedido(mesa)">Confirmar</button>
-            }
-            @if(mesa.nuevoPedido.length == 0 && fncGetPedidosPorMesa(mesa.numero).length > 0){
-              <button mat-raised-button (click)="facturar()">Facturar</button>
-            }
-            @if(mesa.estado.toLowerCase() === 'libre'){
-              <button mat-raised-button (click)="confirmarPedido(mesa)">Asignar</button>
+
+            <!-- @if(mesa.estado.toLowerCase() === 'libre'){
+              <button mat-raised-button (click)="">Asignar</button>
             }
 
             @if(mesa.estado.toLowerCase() === 'por desocupar'){
-              <button mat-raised-button (click)="confirmarPedido(mesa)">Liberar</button>
-            }
+              <button mat-raised-button (click)="">Liberar</button>
+            } -->
           </mat-card-actions>
         </mat-card>
       }
