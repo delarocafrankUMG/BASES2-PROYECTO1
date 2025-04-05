@@ -15,7 +15,9 @@ const getViewData = async (req, res) => {
       'VW_VENTAS_DIARIAS',
       'VW_PEDIDOS_POR_MESERO',
       'VW_CIERRES_CAJA',
-      'VW_ESTADO_MESAS'
+      'VW_ESTADO_MESAS',
+      'VW_PEDIDOS_EN_CURSO',
+      'VW_PRODUCTOS_MAS_VENDIDOS'
     ];
 
     if (!allowedViews.includes(viewName.toUpperCase())) {

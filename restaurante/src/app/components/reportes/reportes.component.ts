@@ -35,6 +35,8 @@ export class ReportesComponent {
     { name: 'Ventas Diarias', value: 'VW_VENTAS_DIARIAS' },
     { name: 'Pedidos por Mesero', value: 'VW_PEDIDOS_POR_MESERO' },
     { name: 'Cierres de Caja', value: 'VW_CIERRES_CAJA' },
+    {name: 'Pedidos en Curso', value: 'VW_PEDIDOS_EN_CURSO'},
+    {name: 'Productos mas vendidos', value: 'VW_PRODUCTOS_MAS_VENDIDOS'}
   ];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
